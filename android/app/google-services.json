@@ -1,0 +1,105 @@
+{
+  "project_info": {
+    "project_number": "449652040934",
+    "project_id": "food-50da5",
+    "storage_bucket": "food-50da5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449652040934:android:bdc4f00929dd0d6b51c727",
+        "android_client_info": {
+          "package_name": "com.example.food"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfNzv75--9RVnpKZcwOXk8CE0BQyvvDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449652040934:android:68a5fc77ae06b27b51c727",
+        "android_client_info": {
+          "package_name": "com.example.jobs_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfNzv75--9RVnpKZcwOXk8CE0BQyvvDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449652040934:android:e93a73e999f7b62b51c727",
+        "android_client_info": {
+          "package_name": "com.example.medica"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfNzv75--9RVnpKZcwOXk8CE0BQyvvDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449652040934:android:fc11a3d0e564b59251c727",
+        "android_client_info": {
+          "package_name": "com.medic.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfNzv75--9RVnpKZcwOXk8CE0BQyvvDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449652040934:android:17ab81ebea593e7f51c727",
+        "android_client_info": {
+          "package_name": "com.medica.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfNzv75--9RVnpKZcwOXk8CE0BQyvvDM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
