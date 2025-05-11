@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:jobs_app/providers/auth_provider.dart';
-import 'package:jobs_app/widgets/job_item.dart';
+import 'package:jobs_app/providers/jobs_provider.dart';
+import 'package:jobs_app/widgets/company_job_item.dart';
 import 'package:provider/provider.dart';
 
-class CompanyJobs extends StatelessWidget {
+class CompanyJobs extends StatefulWidget {
   const CompanyJobs({super.key});
 
   @override
+  State<CompanyJobs> createState() => _CompanyJobsState();
+}
+
+class _CompanyJobsState extends State<CompanyJobs> {
+  @override
+  @override
   Widget build(BuildContext context) {
+    final jobsProvider = Provider.of<JobsProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -15,7 +23,7 @@ class CompanyJobs extends StatelessWidget {
               onPressed: () {
                 Provider.of<AuthProvider>(context, listen: false).logout();
               },
-              child: Text("logout"))
+              child: const Text("logout"))
         ],
         elevation: 0,
         centerTitle: true,
@@ -24,17 +32,49 @@ class CompanyJobs extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ),
-      body: ListView.separated(
-        itemBuilder: (context, index) => const JobItem(
-          jobName: "مهندس",
-          jobLocation: "عطبره",
-          jobDescription: 'مهندس مدني انشائي',
-          jobExperience: '٤ سنوات',
+      body: StreamBuilder(
+          stream: jobsProvider.fetchCompanyjobs(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasData) {
+              return ListView.separated(
+                  itemBuilder: (context, index) {
+                    return CompanyJob(
+                        id: snapshot.data![index].id,
+                        jobName: snapshot.data![index].jobName,
+                        jobDescription: snapshot.data![index].jobDescription,
+                        jobExperience: snapshot.data![index].jobExperience,
+                        jobLocation: snapshot.data![index].jobLocation);
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: 10,
+                    );
+                  },
+                  itemCount: snapshot.data!.length);
+            } else {
+              return Center(
+                child: Text("لا يوجد وظائف"),
+              );
+            }
+          }),
+      floatingActionButton: IconButton(
+        style: IconButton.styleFrom(backgroundColor: Colors.teal),
+        onPressed: () {
+          Navigator.of(context).pushNamed("/add_job", arguments: {
+            "jobname": "",
+            "jobdescription": "",
+            "jobexperience": "",
+            "joblocation": ""
+          });
+        },
+        icon: Icon(
+          Icons.add,
         ),
-        separatorBuilder: (context, index) => const SizedBox(
-          height: 10,
-        ),
-        itemCount: 10,
+        iconSize: 50,
       ),
     );
   }

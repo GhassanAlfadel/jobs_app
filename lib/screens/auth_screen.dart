@@ -143,7 +143,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             if (_formKey.currentState!.validate()) {
                               final AuthProvider authProvider =
                                   Provider.of<AuthProvider>(context,
-                                      listen: true);
+                                      listen: false);
                               authProvider.signupuser(
                                   _emailController.text.trim(),
                                   _passwordController.text.trim(),

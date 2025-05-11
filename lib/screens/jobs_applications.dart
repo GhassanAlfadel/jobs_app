@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jobs_app/providers/auth_provider.dart';
+import 'package:jobs_app/providers/jobs_provider.dart';
 import 'package:jobs_app/widgets/application_item.dart';
+import 'package:jobs_app/widgets/job_item.dart';
 import 'package:provider/provider.dart';
 
 class JobsApplications extends StatelessWidget {
@@ -8,29 +10,63 @@ class JobsApplications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final jobsprovider = Provider.of<JobsProvider>(context, listen: false);
+
     return Scaffold(
+      drawer: Scaffold(
+        body: Column(
+          children: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed("/account_details");
+                },
+                child: Text("account details"))
+          ],
+        ),
+      ),
       appBar: AppBar(
         actions: [
           TextButton(
               onPressed: () {
                 Provider.of<AuthProvider>(context, listen: false).logout();
               },
-              child: Text("logout"))
+              child: const Text("logout"))
         ],
         title: const Align(
           alignment: Alignment.center,
           child: Text("طلبات التوظيف"),
         ),
       ),
-      body: ListView.separated(
-          itemBuilder: (context, index) => const ApplicationItem(
-                userName: "user name",
-                location: "location",
-              ),
-          separatorBuilder: (context, index) => const SizedBox(
-                height: 10,
-              ),
-          itemCount: 5),
+      body: StreamBuilder(
+          stream: jobsprovider.fetchjobs(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasData) {
+              return ListView.separated(
+                  itemBuilder: (context, index) {
+                    return JobItem(
+                        companyname: snapshot.data![index].companyname,
+                        jobtitle: snapshot.data![index].jobtitle,
+                        location: snapshot.data![index].location,
+                        worktime: snapshot.data![index].worktime,
+                        jopexperince: snapshot.data![index].jopexperince,
+                        joblistedtime: snapshot.data![index].joblistedtime);
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: 5,
+                    );
+                  },
+                  itemCount: snapshot.data!.length);
+            } else {
+              return Center(
+                child: Text("لا توجد وظائف"),
+              );
+            }
+          }),
     );
   }
 }

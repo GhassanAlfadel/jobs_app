@@ -2,88 +2,82 @@
 import 'package:flutter/material.dart';
 
 class JobItem extends StatelessWidget {
-  final String jobName;
-  final String jobDescription;
-  final String jobExperience;
-  final String jobLocation;
+  final String companyname;
+  final String jobtitle;
+  final String location;
+  final String worktime;
+  final String jopexperince;
+  final String joblistedtime;
 
   const JobItem({
-    super.key,
-    required this.jobName,
-    required this.jobDescription,
-    required this.jobExperience,
-    required this.jobLocation,
-  });
+    Key? key,
+    required this.companyname,
+    required this.jobtitle,
+    required this.location,
+    required this.worktime,
+    required this.jopexperince,
+    required this.joblistedtime,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl, // Arabic layout support
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Container(
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      textDirection: TextDirection.rtl,
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
             children: [
-              // Job Name and Action Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    jobName,
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      jobtitle,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  // Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          // TODO: Delete action
-                        },
-                        icon:
-                            const Icon(Icons.delete_outline, color: Colors.red),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // TODO: Edit action
-                        },
-                        icon:
-                            const Icon(Icons.edit_outlined, color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                  // Job Name
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Job Description
-              _buildInfoRow("الوصف الوظيفي", jobDescription),
-              const SizedBox(height: 8),
-
-              // Job Experience
-              _buildInfoRow("الخبرة المطلوبة", jobExperience),
-              const SizedBox(height: 8),
-
-              // Job Location
-              _buildInfoRow("مكان العمل", jobLocation),
+                    SizedBox(height: 4),
+                    Text(companyname),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(location),
+                        SizedBox(width: 4),
+                        Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(jopexperince),
+                        SizedBox(width: 4),
+                        Icon(Icons.timer, size: 16, color: Colors.grey),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(worktime),
+                        SizedBox(width: 4),
+                        Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(joblistedtime.toString()),
+                        SizedBox(width: 4),
+                        Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      ],
+                    )
+                  ],
+                ),
+              )
+              // Company logo placeholder
             ],
           ),
         ),
@@ -91,35 +85,13 @@ class JobItem extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.info_outline, size: 20, color: Colors.teal),
-        const SizedBox(width: 8),
-        Expanded(
-          child: RichText(
-            textAlign: TextAlign.right,
-            text: TextSpan(
-              text: "$label: ",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-              children: [
-                TextSpan(
-                  text: value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+  static fromMap(Map<String, dynamic> map) {
+    return JobItem(
+        companyname: map["companyname"] ?? "",
+        jobtitle: map["jobname"] ?? "",
+        location: map["joblocation"] ?? "",
+        worktime: map["worktime"] ?? "",
+        jopexperince: map["jobexperience"] ?? "",
+        joblistedtime: map["createdat"] ?? "");
   }
 }
