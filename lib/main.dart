@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
             routes: {
               "/auth_screen": (context) => const AuthScreen(),
               "/company_jobs": (context) => const CompanyJobs(),
-              "/account_details": (context) => UserDetailsPage(
+              "/account_details": (context) => const UserDetailsPage(
                     name: '',
                     email: '',
                     phone: '',
@@ -72,12 +72,6 @@ class _MyAppState extends State<MyApp> {
                   ),
               "/jobs_applications": (context) => const JobsApplications(),
               "/add_job": (context) => const AddJob(),
-              "/application_drtails": (context) => const ApplicationDetails(
-                    userName: '',
-                    userLocation: '',
-                    jobName: '',
-                    jonName: '',
-                  )
             },
             home: _isLoading
                 ? const Scaffold(

@@ -91,7 +91,7 @@ class _AddJobState extends State<AddJob> {
                   textDirection: TextDirection.rtl,
                   child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(
-                      label: Text("اختر المدينه"),
+                      label: const Text("اختر المدينه"),
                       filled: true,
                       fillColor: Colors.grey.shade300,
                       border: OutlineInputBorder(
@@ -113,14 +113,14 @@ class _AddJobState extends State<AddJob> {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 12,
                 ),
                 Directionality(
                   textDirection: TextDirection.rtl,
                   child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(
-                      label: Text("نوع الدوام"),
+                      label: const Text("نوع الدوام"),
                       filled: true,
                       fillColor: Colors.grey.shade300,
                       border: OutlineInputBorder(

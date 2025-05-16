@@ -1,5 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:jobs_app/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'package:jobs_app/providers/jobs_provider.dart';
 
 class JobItem extends StatelessWidget {
   final String companyname;
@@ -8,16 +12,20 @@ class JobItem extends StatelessWidget {
   final String worktime;
   final String jopexperince;
   final String joblistedtime;
+  final String companyid;
+  final String jobid;
 
   const JobItem({
-    Key? key,
+    super.key,
     required this.companyname,
     required this.jobtitle,
     required this.location,
     required this.worktime,
     required this.jopexperince,
     required this.joblistedtime,
-  }) : super(key: key);
+    required this.companyid,
+    required this.jobid,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +36,7 @@ class JobItem extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Expanded(
@@ -37,46 +45,67 @@ class JobItem extends StatelessWidget {
                   children: [
                     Text(
                       jobtitle,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(companyname),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Text(location),
-                        SizedBox(width: 4),
-                        Icon(Icons.location_on, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.location_on,
+                            size: 16, color: Colors.grey),
                       ],
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         Text(jopexperince),
-                        SizedBox(width: 4),
-                        Icon(Icons.timer, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.timer, size: 16, color: Colors.grey),
                       ],
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         Text(worktime),
-                        SizedBox(width: 4),
-                        Icon(Icons.access_time, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.access_time,
+                            size: 16, color: Colors.grey),
                       ],
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         Text(joblistedtime.toString()),
-                        SizedBox(width: 4),
-                        Icon(Icons.access_time, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.access_time,
+                            size: 16, color: Colors.grey),
                       ],
                     )
                   ],
                 ),
-              )
+              ),
+              TextButton(
+                  onPressed: () async {
+                    final jobsprovider =
+                        Provider.of<JobsProvider>(context, listen: false);
+                    final authsprovider =
+                        Provider.of<AuthProvider>(context, listen: false);
+                    final userData = await authsprovider.getUserData();
+                    jobsprovider.jopApplication(
+                        companyid,
+                        jobid,
+                        userData["id"].toString(),
+                        userData["name"].toString(),
+                        companyname,
+                        jobtitle,
+                        userData["location"].toString(),
+                        userData["cv"].toString());
+                  },
+                  child: const Text("تقديم طلب")),
               // Company logo placeholder
             ],
           ),
@@ -87,11 +116,14 @@ class JobItem extends StatelessWidget {
 
   static fromMap(Map<String, dynamic> map) {
     return JobItem(
-        companyname: map["companyname"] ?? "",
-        jobtitle: map["jobname"] ?? "",
-        location: map["joblocation"] ?? "",
-        worktime: map["worktime"] ?? "",
-        jopexperince: map["jobexperience"] ?? "",
-        joblistedtime: map["createdat"] ?? "");
+      companyid: map["companyid"] ?? "",
+      companyname: map["companyname"] ?? "",
+      jobtitle: map["jobname"] ?? "",
+      location: map["joblocation"] ?? "",
+      worktime: map["worktime"] ?? "",
+      jopexperince: map["jobexperience"] ?? "",
+      joblistedtime: map["createdat"] ?? "",
+      jobid: map["jobid"] ?? "",
+    );
   }
 }

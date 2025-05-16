@@ -95,11 +95,11 @@ class _AuthScreenState extends State<AuthScreen> {
                               value == null ? 'الرجاء اختيار المدينة' : null,
                           items: const [
                             DropdownMenuItem(
-                                value: "shendi", child: Text("شندي")),
+                                value: "شندي", child: Text("شندي")),
                             DropdownMenuItem(
-                                value: "khartoum", child: Text("الخرطوم")),
+                                value: "الخرطوم", child: Text("الخرطوم")),
                             DropdownMenuItem(
-                                value: "atbara", child: Text("عطبرة")),
+                                value: "عطبرة", child: Text("عطبرة")),
                           ],
                         ),
                         const SizedBox(height: 12),

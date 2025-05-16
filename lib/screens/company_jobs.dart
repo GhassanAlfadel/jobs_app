@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jobs_app/providers/auth_provider.dart';
 import 'package:jobs_app/providers/jobs_provider.dart';
+import 'package:jobs_app/screens/applecation_details.dart';
 import 'package:jobs_app/widgets/company_job_item.dart';
 import 'package:provider/provider.dart';
 
@@ -36,27 +37,35 @@ class _CompanyJobsState extends State<CompanyJobs> {
           stream: jobsProvider.fetchCompanyjobs(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             } else if (snapshot.hasData) {
               return ListView.separated(
                   itemBuilder: (context, index) {
-                    return CompanyJob(
-                        id: snapshot.data![index].id,
-                        jobName: snapshot.data![index].jobName,
-                        jobDescription: snapshot.data![index].jobDescription,
-                        jobExperience: snapshot.data![index].jobExperience,
-                        jobLocation: snapshot.data![index].jobLocation);
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ApplicationDetails(
+                                  jobid: snapshot.data![index].id.toString(),
+                                )));
+                      },
+                      child: CompanyJob(
+                          id: snapshot.data![index].id,
+                          jobName: snapshot.data![index].jobName,
+                          jobDescription: snapshot.data![index].jobDescription,
+                          jobExperience: snapshot.data![index].jobExperience,
+                          jobLocation: snapshot.data![index].jobLocation),
+                    );
                   },
                   separatorBuilder: (context, index) {
-                    return SizedBox(
+                    return const SizedBox(
                       height: 10,
                     );
                   },
                   itemCount: snapshot.data!.length);
             } else {
-              return Center(
+              return const Center(
                 child: Text("لا يوجد وظائف"),
               );
             }
@@ -71,7 +80,7 @@ class _CompanyJobsState extends State<CompanyJobs> {
             "joblocation": ""
           });
         },
-        icon: Icon(
+        icon: const Icon(
           Icons.add,
         ),
         iconSize: 50,

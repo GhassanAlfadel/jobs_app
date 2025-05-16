@@ -3,11 +3,14 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:jobs_app/screens/company_jobs.dart';
 import 'package:jobs_app/screens/jobs_applications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as path;
 
 class AuthProvider with ChangeNotifier {
   final _auth = FirebaseAuth.instance;
@@ -22,8 +25,12 @@ class AuthProvider with ChangeNotifier {
   Future addUser(String name, String location, String phoneNumber) async {
     final user = FirebaseAuth.instance.currentUser;
     if (isUser) {
-      await _firsStore.collection("users").doc(user!.uid).set(
-          {"name": name, "location": location, "phonenumber": phoneNumber});
+      await _firsStore.collection("users").doc(user!.uid).set({
+        "id": user.uid,
+        "name": name,
+        "location": location,
+        "phonenumber": phoneNumber
+      });
     } else {
       companyname = name;
       notifyListeners();
@@ -86,10 +93,11 @@ class AuthProvider with ChangeNotifier {
 
   Future login(String email, password, BuildContext context) async {
     final pref = await SharedPreferences.getInstance();
+
     getcompanyname();
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-
+      checkuserrole(context);
       logedin = true;
       userId = _auth.currentUser!.uid;
       notifyListeners();
@@ -151,5 +159,32 @@ class AuthProvider with ChangeNotifier {
     logedin = false;
 
     notifyListeners();
+  }
+
+  Future<void> pickAndUploadPDF() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom, allowedExtensions: ['pdf'], withData: true);
+
+    if (result != null && result.files.single.path != null) {
+      final file = result.files.single;
+      final fileName = path.basename(file.path!);
+
+      final ref = FirebaseStorage.instance.ref().child('pdfs/$fileName');
+      await ref.putData(file.bytes!);
+
+      final url = await ref.getDownloadURL();
+      await _firsStore.collection("users").doc(user!.uid).update({"cv": url});
+      print(url);
+    }
+  }
+
+  Future<Map<String, String>> getUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final userData = await _firsStore.collection("users").doc(user!.uid).get();
+
+    return userData.data()!.cast<String, String>();
   }
 }
