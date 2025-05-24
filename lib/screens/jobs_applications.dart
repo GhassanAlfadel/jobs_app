@@ -1,74 +1,195 @@
 import 'package:flutter/material.dart';
 import 'package:jobs_app/providers/auth_provider.dart';
 import 'package:jobs_app/providers/jobs_provider.dart';
-import 'package:jobs_app/widgets/application_item.dart';
 import 'package:jobs_app/widgets/job_item.dart';
 import 'package:provider/provider.dart';
 
-class JobsApplications extends StatelessWidget {
+class JobsApplications extends StatefulWidget {
   const JobsApplications({super.key});
+
+  @override
+  State<JobsApplications> createState() => _JobsApplicationsState();
+}
+
+class _JobsApplicationsState extends State<JobsApplications> {
+  String? city;
+  String? worktime;
+  bool filtering = false;
+
+  Widget buildFilterRow() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                filtering = true;
+              });
+            },
+            child: const Text("فلتره"),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                label: const Text("المدينه"),
+                filled: true,
+                fillColor: Colors.grey.shade300,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              value: city,
+              onChanged: (value) {
+                setState(() {
+                  city = value;
+                });
+              },
+              items: const [
+                DropdownMenuItem(value: "شندي", child: Text("شندي")),
+                DropdownMenuItem(value: "الخرطوم", child: Text("الخرطوم")),
+                DropdownMenuItem(value: "عطبرة", child: Text("عطبرة")),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                label: const Text("الدوام"),
+                filled: true,
+                fillColor: Colors.grey.shade300,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              value: worktime,
+              onChanged: (value) {
+                setState(() {
+                  worktime = value;
+                });
+              },
+              items: const [
+                DropdownMenuItem(value: "دوام كامل", child: Text("دوام كامل")),
+                DropdownMenuItem(value: "دوام جزئي", child: Text("دوام جزئي")),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final jobsprovider = Provider.of<JobsProvider>(context, listen: false);
+    final authprovider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
-      drawer: Container(
-        color: Colors.white,
-        width: 200,
-        height: double.maxFinite,
-        child: TextButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed("/account_details");
-            },
-            child: const Text("account details")),
-      ),
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         actions: [
-          TextButton(
-              onPressed: () {
-                Provider.of<AuthProvider>(context, listen: false).logout();
-              },
-              child: const Text("logout"))
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed("/account_details",
+                  arguments: authprovider.getUserData());
+            },
+            icon: const Icon(Icons.account_circle),
+          ),
         ],
         title: const Align(
           alignment: Alignment.center,
           child: Text("طلبات التوظيف"),
         ),
       ),
-      body: StreamBuilder(
-          stream: jobsprovider.fetchjobs(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasData) {
-              return ListView.separated(
-                  itemBuilder: (context, index) {
-                    return JobItem(
-                      companyid: snapshot.data![index].companyid,
-                      companyname: snapshot.data![index].companyname,
-                      jobtitle: snapshot.data![index].jobtitle,
-                      location: snapshot.data![index].location,
-                      worktime: snapshot.data![index].worktime,
-                      jopexperince: snapshot.data![index].jopexperince,
-                      joblistedtime: snapshot.data![index].joblistedtime,
-                      jobid: snapshot.data![index].jobid,
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const SizedBox(
-                      height: 5,
-                    );
-                  },
-                  itemCount: snapshot.data!.length);
-            } else {
-              return const Center(
-                child: Text("لا توجد وظائف"),
-              );
-            }
-          }),
+      body: filtering
+          ? FutureBuilder(
+              future: jobsprovider.filterjops(city ?? "", worktime ?? ""),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    children: [
+                      buildFilterRow(),
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (context, index) {
+                            final job = snapshot.data![index];
+                            return JobItem(
+                              companyid: job.companyid,
+                              companyname: job.companyname,
+                              jobtitle: job.jobtitle,
+                              location: job.location,
+                              worktime: job.worktime,
+                              jopexperince: job.jopexperince,
+                              joblistedtime: job.joblistedtime,
+                              jobid: job.jobid,
+                            );
+                          },
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 5),
+                          itemCount: snapshot.data!.length,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      buildFilterRow(),
+                      const Expanded(
+                        child: Center(child: Text("لا توجد وظائف")),
+                      ),
+                    ],
+                  );
+                }
+              },
+            )
+          : StreamBuilder(
+              stream: jobsprovider.fetchjobs(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    children: [
+                      buildFilterRow(),
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (context, index) {
+                            final job = snapshot.data![index];
+                            return JobItem(
+                              companyid: job.companyid,
+                              companyname: job.companyname,
+                              jobtitle: job.jobtitle,
+                              location: job.location,
+                              worktime: job.worktime,
+                              jopexperince: job.jopexperince,
+                              joblistedtime: job.joblistedtime,
+                              jobid: job.jobid,
+                            );
+                          },
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 5),
+                          itemCount: snapshot.data!.length,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      buildFilterRow(),
+                      const Expanded(
+                        child: Center(child: Text("لا توجد وظائف")),
+                      ),
+                    ],
+                  );
+                }
+              },
+            ),
     );
   }
 }

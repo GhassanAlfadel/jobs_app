@@ -138,21 +138,28 @@ class _AuthScreenState extends State<AuthScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              final AuthProvider authProvider =
-                                  Provider.of<AuthProvider>(context,
-                                      listen: false);
-                              authProvider.signupuser(
-                                  _emailController.text.trim(),
-                                  _passwordController.text.trim(),
-                                  _usernameController.text.trim(),
-                                  _selectedCity.toString(),
-                                  _phoneController.text.trim());
-                            }
+                        Consumer<AuthProvider>(
+                          builder: (context, auth, _) {
+                            return auth.isloading
+                                ? const CircularProgressIndicator()
+                                : ElevatedButton(
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        final AuthProvider authProvider =
+                                            Provider.of<AuthProvider>(context,
+                                                listen: false);
+                                        authProvider.signupuser(
+                                            _emailController.text.trim(),
+                                            _passwordController.text.trim(),
+                                            _usernameController.text.trim(),
+                                            _selectedCity.toString(),
+                                            _phoneController.text.trim(),
+                                            context);
+                                      }
+                                    },
+                                    child: const Text("تسجيل"),
+                                  );
                           },
-                          child: const Text("Signup"),
                         ),
                         const SizedBox(height: 10),
                         TextButton(
@@ -212,19 +219,25 @@ class _AuthScreenState extends State<AuthScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              final AuthProvider authProvider =
-                                  Provider.of<AuthProvider>(context,
-                                      listen: false);
-                              await authProvider.login(
-                                  _emailController.text.trim(),
-                                  _passwordController.text.trim(),
-                                  context);
-                            }
+                        Consumer<AuthProvider>(
+                          builder: (context, auth, _) {
+                            return auth.isloading
+                                ? const CircularProgressIndicator()
+                                : ElevatedButton(
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        final AuthProvider authProvider =
+                                            Provider.of<AuthProvider>(context,
+                                                listen: false);
+                                        await authProvider.login(
+                                            _emailController.text.trim(),
+                                            _passwordController.text.trim(),
+                                            context);
+                                      }
+                                    },
+                                    child: const Text("تسجيل دخول"),
+                                  );
                           },
-                          child: const Text("Signup"),
                         ),
                         const SizedBox(height: 10),
                         TextButton(

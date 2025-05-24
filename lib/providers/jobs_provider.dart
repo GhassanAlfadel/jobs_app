@@ -5,9 +5,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jobs_app/widgets/application_item.dart';
 import 'package:jobs_app/widgets/company_job_item.dart';
 import 'package:jobs_app/widgets/job_item.dart';
+import 'package:jobs_app/widgets/user_application.dart';
 import 'package:path/path.dart' as path;
 
 class JobsProvider with ChangeNotifier {
@@ -28,6 +30,11 @@ class JobsProvider with ChangeNotifier {
   List<ApplicationItem> _applications = [];
 
   List<ApplicationItem> get applications => _applications;
+
+  List<UserApplication> _userapplications = [];
+
+  List<UserApplication> get userapplications => _userapplications;
+
   Future addJob(String jobName, String jobDescription, String jobExperience,
       String jobLocation, String compabyName, String worktime) async {
     try {
@@ -42,7 +49,7 @@ class JobsProvider with ChangeNotifier {
         "jobexperience": jobExperience,
         "joblocation": jobLocation,
         "worktime": worktime,
-        "createdat": DateTime.now().toString()
+        "createdat": formatTime(DateTime.now())
       }).then((value) {
         jobid = value.id;
       });
@@ -56,7 +63,7 @@ class JobsProvider with ChangeNotifier {
         "jobexperience": jobExperience,
         "joblocation": jobLocation,
         "worktime": worktime,
-        "createdat": DateTime.now().toString()
+        "createdat": formatTime(DateTime.now())
       });
     } on FirebaseAuthException {}
   }
@@ -88,7 +95,7 @@ class JobsProvider with ChangeNotifier {
         job.id = doc.id;
         _companyjobs.add(job);
       }
-      return _companyjobs;
+      return _companyjobs.reversed.toList();
     });
   }
 
@@ -102,40 +109,13 @@ class JobsProvider with ChangeNotifier {
 
         _jobs.add(job);
       }
-      print(jobs);
-      return _jobs;
+
+      return _jobs.reversed.toList();
     });
   }
 
-  // Future<void> pickAndUploadPDF() async {
-  //   final user = FirebaseAuth.instance.currentUser;
-
-  //   final result = await FilePicker.platform.pickFiles(
-  //       type: FileType.custom, allowedExtensions: ['pdf'], withData: true);
-  //   uploading = true;
-  //   notifyListeners();
-
-  //   if (result != null && result.files.single.path != null) {
-  //     final file = result.files.single;
-  //     final fileName = path.basename(file.path!);
-
-  //     try {
-  //       final ref = FirebaseStorage.instance.ref().child('pdfs/$fileName');
-  //       await ref.putData(file.bytes!).then((onValue) {
-  //         uploading = false;
-  //       });
-
-  //       final url = await ref.getDownloadURL();
-  //       print(url);
-  //       await _firsStore.collection("users").doc(user!.uid).update({"cv": url});
-  //       notifyListeners();
-  //     } on FirebaseException catch (e) {
-  //       log(e.code);
-  //     }
-  //   }
-  // }
-
   Future<void> pickAndUploadPDF() async {
+    final userid = _auth.currentUser!.uid;
     uploading = true;
     notifyListeners();
 
@@ -146,7 +126,8 @@ class JobsProvider with ChangeNotifier {
       if (result != null && result.files.single.path != null) {
         final file = result.files.single;
         final fileName = path.basename(file.path!);
-        final ref = FirebaseStorage.instance.ref().child('pdfs/$fileName');
+        final ref =
+            FirebaseStorage.instance.ref().child('pdfs//$userid// fileName');
         await ref.putData(file.bytes!);
 
         final url = await ref.getDownloadURL();
@@ -170,25 +151,15 @@ class JobsProvider with ChangeNotifier {
       String companyname,
       String jobtitle,
       String loaction,
-      String cvlink) async {
+      String cvlink,
+      BuildContext context) async {
     final user = _auth.currentUser;
-
-    // await _firsStore
-    //     .collection("companes")
-    //     .doc(comapnyid)
-    //     .collection("jobs")
-    //     .doc(jobid)
-    //     .collection("applications")
-    //     .add({
-    //   "userid": userid,
-    //   "name": username,
-    //   "location": loaction,
-    //   'cv': cvlink
-    // });
 
     try {
       await _firsStore.collection("applications").add({
+        "jobtitle": jobtitle,
         "userid": user!.uid,
+        "companyname": companyname,
         "jobid": jobid,
         "name": username,
         "location": loaction,
@@ -196,25 +167,49 @@ class JobsProvider with ChangeNotifier {
         "rejectreson": "",
         "cv": cvlink
       });
-    } on FirebaseException catch (e) {}
+
+      showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            backgroundColor: Colors.blue,
+            content: const Text(
+              'تم التقديم بنجاح',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+            actions: [
+              TextButton(
+                child: const Text(
+                  'تم',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(); // Close the dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } on FirebaseException {}
   }
 
-  Future<List<ApplicationItem>> getJopApplications(
+  Stream<List<ApplicationItem>> getJopApplications(
     String jobid,
-  ) async {
+  ) {
     _applications = [];
-    try {
-      final applicationData = await _firsStore.collection("applications").get();
-      for (var item in applicationData.docs) {
+
+    return _firsStore.collection("applications").snapshots().map((snapshot) {
+      for (var item in snapshot.docs) {
         final data = item.data();
         if (data["jobid"] == jobid) {
           final ApplicationItem application = ApplicationItem.fromMap(data);
           _applications.add(application);
         }
       }
-    } catch (e) {}
-
-    return _applications;
+      print(_applications);
+      return _applications;
+    });
   }
 
   Future updateApplicationStatus(
@@ -229,6 +224,7 @@ class JobsProvider with ChangeNotifier {
                 .collection("applications")
                 .doc(item.id)
                 .update({"status": status, "rejectreson": rejectReson});
+
             break;
           } else {
             await _firsStore
@@ -241,5 +237,61 @@ class JobsProvider with ChangeNotifier {
     } catch (e) {
       print("errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwvwkrovqwkvl");
     }
+  }
+
+  Future filterjops(String location, String worktime) async {
+    _jobs = [];
+    try {
+      final jobsdata = await _firsStore.collection("jobs").get();
+      for (var item in jobsdata.docs) {
+        final data = item.data();
+        if (data["joblocation"] == location && data["worktime"] == worktime) {
+          final JobItem job = JobItem.fromMap(data);
+          _jobs.add(job);
+        }
+      }
+    } catch (e) {}
+    print(_jobs);
+    return _jobs.reversed.toList();
+  }
+
+  Stream<List<UserApplication>> fetchuserapplications() {
+    final user = _auth.currentUser;
+    print(user!.uid);
+
+    return _firsStore.collection("applications").snapshots().map((snapshot) {
+      _userapplications = [];
+      for (var doc in snapshot.docs) {
+        final UserApplication userapplication =
+            UserApplication.fromMap(doc.data());
+        if (userapplication.userid == user.uid) {
+          _userapplications.add(userapplication);
+        }
+      }
+
+      print(_userapplications);
+      return _userapplications.reversed.toList();
+    });
+  }
+
+  String formatTime(DateTime time) {
+    final formattedDate = DateFormat('d-MMMM-y', 'ar').format(time);
+
+    const westernToArabicDigits = {
+      '0': '٠',
+      '1': '١',
+      '2': '٢',
+      '3': '٣',
+      '4': '٤',
+      '5': '٥',
+      '6': '٦',
+      '7': '٧',
+      '8': '٨',
+      '9': '٩',
+    };
+
+    return formattedDate.split('').map((char) {
+      return westernToArabicDigits[char] ?? char;
+    }).join();
   }
 }

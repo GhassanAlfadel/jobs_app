@@ -20,11 +20,12 @@ class _CompanyJobsState extends State<CompanyJobs> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          TextButton(
+          IconButton(
               onPressed: () {
-                Provider.of<AuthProvider>(context, listen: false).logout();
+                Provider.of<AuthProvider>(context, listen: false)
+                    .logout(context);
               },
-              child: const Text("logout"))
+              icon: Icon(Icons.logout_rounded))
         ],
         elevation: 0,
         centerTitle: true,

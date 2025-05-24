@@ -21,12 +21,12 @@ class ApplicationDetails extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("تفاصيل الطلب"),
+          title: const Text("طلبات التوظيف"),
           centerTitle: true,
-          backgroundColor: Colors.teal,
+          backgroundColor: Colors.blue,
         ),
-        body: FutureBuilder(
-            future: jobsprovider.getJopApplications(
+        body: StreamBuilder(
+            stream: jobsprovider.getJopApplications(
               jobid,
             ),
             builder: (context, snapshot) {
@@ -43,6 +43,7 @@ class ApplicationDetails extends StatelessWidget {
                         cv: snapshot.data![index].cv,
                         userid: snapshot.data![index].userid,
                         jobid: snapshot.data![index].jobid,
+                        status: snapshot.data![index].status,
                       );
                     },
                     separatorBuilder: (context, index) => const SizedBox(
@@ -55,37 +56,6 @@ class ApplicationDetails extends StatelessWidget {
                 );
               }
             }),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(
-    IconData icon,
-    String label,
-    String value,
-    TextStyle labelStyle,
-    TextStyle valueStyle,
-  ) {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black38,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: labelStyle),
-                const SizedBox(height: 4),
-                Text(value, style: valueStyle),
-              ],
-            ),
-            Icon(icon, size: 30, color: Colors.teal),
-          ],
-        ),
       ),
     );
   }

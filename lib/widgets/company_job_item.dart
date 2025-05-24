@@ -30,7 +30,7 @@ class CompanyJob extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.blue,
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
               BoxShadow(
@@ -50,10 +50,7 @@ class CompanyJob extends StatelessWidget {
                   Text(
                     jobName,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
                   ),
                   // Buttons
                   Row(
@@ -77,7 +74,7 @@ class CompanyJob extends StatelessWidget {
                           });
                         },
                         icon:
-                            const Icon(Icons.edit_outlined, color: Colors.blue),
+                            const Icon(Icons.edit_outlined, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -87,51 +84,22 @@ class CompanyJob extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Job Description
-              _buildInfoRow("الوصف الوظيفي", jobDescription),
-              const SizedBox(height: 8),
-
-              // Job Experience
-              _buildInfoRow("الخبرة المطلوبة", jobExperience),
-              const SizedBox(height: 8),
-
-              // Job Location
-              _buildInfoRow("مكان العمل", jobLocation),
+              Text(
+                "الوصف الوظيفي :$jobDescription ",
+                style: const TextStyle(fontSize: 20, color: Colors.white),
+              ),
+              Text(
+                " الموقع :$jobLocation ",
+                style: const TextStyle(fontSize: 20, color: Colors.white),
+              ),
+              Text(
+                " الخبرات المطلوبه : $jobExperience ",
+                style: const TextStyle(fontSize: 20, color: Colors.white),
+              )
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.info_outline, size: 20, color: Colors.teal),
-        const SizedBox(width: 8),
-        Expanded(
-          child: RichText(
-            textAlign: TextAlign.right,
-            text: TextSpan(
-              text: "$label: ",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-              children: [
-                TextSpan(
-                  text: value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 

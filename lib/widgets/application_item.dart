@@ -9,6 +9,7 @@ class ApplicationItem extends StatelessWidget {
   final String userName;
   final String location;
   final String cv;
+  final String status;
   String userid;
   String jobid;
 
@@ -19,6 +20,7 @@ class ApplicationItem extends StatelessWidget {
     required this.cv,
     required this.userid,
     required this.jobid,
+    required this.status,
   });
 
   @override
@@ -32,7 +34,7 @@ class ApplicationItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.blue,
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
               BoxShadow(
@@ -46,26 +48,23 @@ class ApplicationItem extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.person, size: 30, color: Colors.teal),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           userName,
                           style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              fontSize: 24, color: Colors.white),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           location,
                           style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
+                            fontSize: 24,
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -76,50 +75,72 @@ class ApplicationItem extends StatelessWidget {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => PdfView(pdflink: cv)));
                       },
-                      child: const Text("قراءة السيره الزاتيه"))
+                      child: const Text(
+                        "قراءة السيره الزاتيه",
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ))
                 ],
               ),
-              Row(
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        jobsprovider.updateApplicationStatus(
-                            userid, jobid, "مقبول", "");
-                      },
-                      child: const Text("قبول")),
-                  TextButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text("الرجاء ادخال سبب الرفض"),
-                                content: TextField(
-                                  controller: resonController,
-                                ),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text("الغاء")),
-                                  TextButton(
-                                      onPressed: () {
-                                        jobsprovider.updateApplicationStatus(
-                                            userid,
-                                            jobid,
-                                            "رفض",
-                                            resonController.text);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text("ارسال"))
-                                ],
-                              );
-                            });
-                      },
-                      child: const Text("رفض"))
-                ],
-              )
+              status == "مقبول"
+                  ? const Text(
+                      "مقبول",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  : status == "رفض"
+                      ? const Text(
+                          "مرفوض",
+                          style: TextStyle(color: Colors.white),
+                        )
+                      : Row(
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  jobsprovider.updateApplicationStatus(
+                                      userid, jobid, "مقبول", "");
+                                  jobsprovider.getJopApplications(jobid);
+                                },
+                                child: const Text("قبول")),
+                            TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                              "الرجاء ادخال سبب الرفض"),
+                                          content: TextField(
+                                            controller: resonController,
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text("الغاء")),
+                                            TextButton(
+                                                onPressed: () {
+                                                  jobsprovider
+                                                      .updateApplicationStatus(
+                                                          userid,
+                                                          jobid,
+                                                          "رفض",
+                                                          resonController.text);
+                                                  jobsprovider
+                                                      .getJopApplications(
+                                                          jobid);
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text("ارسال"))
+                                          ],
+                                        );
+                                      });
+                                },
+                                child: const Text("رفض"))
+                          ],
+                        )
             ],
           ),
         ),
@@ -134,6 +155,7 @@ class ApplicationItem extends StatelessWidget {
       cv: map["cv"] ?? "",
       userid: map["userid"] ?? '',
       jobid: map["jobid"] ?? '',
+      status: map["status"] ?? '',
     );
   }
 }

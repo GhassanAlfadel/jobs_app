@@ -32,6 +32,7 @@ class JobItem extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Card(
+        color: Colors.blue,
         elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -44,47 +45,58 @@ class JobItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      jobtitle,
+                      overflow: TextOverflow.clip,
+                      "الوظيفة : $jobtitle",
                       style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(companyname),
+                    Text(
+                      overflow: TextOverflow.clip,
+                      "الشركة : $companyname",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(location),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.location_on,
-                            size: 16, color: Colors.grey),
-                      ],
+                    Text(
+                      overflow: TextOverflow.clip,
+                      "الموقع : $location",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(jopexperince),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.timer, size: 16, color: Colors.grey),
-                      ],
+                    Text(
+                      overflow: TextOverflow.clip,
+                      "الخبرات المطلوبه : $jopexperince",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(worktime),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.access_time,
-                            size: 16, color: Colors.grey),
-                      ],
+                    Text(
+                      overflow: TextOverflow.clip,
+                      "الدوام : $worktime",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(joblistedtime.toString()),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.access_time,
-                            size: 16, color: Colors.grey),
-                      ],
-                    )
+                    Text(
+                      overflow: TextOverflow.clip,
+                      "تاريخ الاضافه : $joblistedtime",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
               ),
@@ -98,14 +110,21 @@ class JobItem extends StatelessWidget {
                     jobsprovider.jopApplication(
                         companyid,
                         jobid,
-                        userData["id"].toString(),
+                        userData!["id"].toString(),
                         userData["name"].toString(),
                         companyname,
                         jobtitle,
                         userData["location"].toString(),
-                        userData["cv"].toString());
+                        userData["cv"].toString(),
+                        context);
                   },
-                  child: const Text("تقديم طلب")),
+                  child: const Text(
+                    "تقديم طلب",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  )),
               // Company logo placeholder
             ],
           ),
